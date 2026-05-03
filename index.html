@@ -767,9 +767,17 @@ function delPlan(id){if(!confirm('確定刪除此計畫？'))return;S.plans=S.pl
 function rHd(){
   const exp=S.items.filter(i=>i.dir==='exp');
   const inc=S.items.filter(i=>i.dir==='inc');
+  // 我的實際負擔：
+  // 不平分 → 全額
+  // 男友欠我一半(bf) → 我付一半
+  // 我欠男友一半(me) → 我付一半
+  const myExp=exp.reduce((s,i)=>{
+    if(i.sp==='bf') return s+Math.round(i.amt/2);  // 我付一半
+    if(i.sp==='me') return s+Math.round(i.amt/2);  // 我付一半
+    return s+i.amt;  // 我付全額
+  },0);
   const bf=exp.filter(i=>i.sp==='bf').reduce((s,i)=>s+Math.round(i.amt/2),0);
   const me=exp.filter(i=>i.sp==='me').reduce((s,i)=>s+Math.round(i.amt/2),0);
-  const myExp=exp.reduce((s,i)=>s+i.amt,0)-bf+me;
   const totalInc=inc.reduce((s,i)=>s+i.amt,0);
   const fi=S.fixedItems||[];
   const fixedTotal=fi.reduce((s,f)=>s+(f.amt||0),0);
